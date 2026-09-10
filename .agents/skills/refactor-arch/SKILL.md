@@ -16,6 +16,7 @@ A skill `refactor-arch` é uma ferramenta especializada e agnóstica de tecnolog
 ## Estrutura Modular de Referências
 
 Antes de executar cada fase, consulte os arquivos de referência correspondentes:
+
 - **Heurísticas de Descoberta:** [project-analysis.md](./references/project-analysis.md)
 - **Catálogo de Anti-Patterns:** [antipatterns-catalog.md](./references/antipatterns-catalog.md)
 - **Schema do Relatório de Auditoria:** [report-template.md](./references/report-template.md)
@@ -49,6 +50,7 @@ flowchart TD
    - Avaliar a estrutura atual (Monólito Desestruturado, Parcialmente Estruturado, etc.).
 3. **Exibição do Resumo:**
    Imprimir no terminal o bloco padronizado:
+
    ```text
    ================================
    PHASE 1: PROJECT ANALYSIS
@@ -91,6 +93,7 @@ flowchart TD
 > NENHUM arquivo do código-fonte pode ser criado, modificado ou removido antes da confirmação formal do usuário.
 
 A skill deve apresentar a seguinte mensagem de bloqueio interativo:
+
 ```text
 ================================================================
 Phase 2 complete. Audit report saved to reports/audit-project-<N>.md.
@@ -98,6 +101,7 @@ Summary: <C> Critical | <H> High | <M> Medium | <L> Low findings.
 Proceed with refactoring (Phase 3)? [y/n]
 ================================================================
 ```
+
 - Se a resposta for **afirmativa (`y` / `yes` / aprovação formal do usuário)**: avançar para a Fase 3.
 - Se a resposta for **negativa ou inexistente**: interromper imediatamente a execução sem modificar arquivos.
 

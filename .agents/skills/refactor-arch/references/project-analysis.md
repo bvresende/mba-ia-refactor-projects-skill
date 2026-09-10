@@ -16,7 +16,8 @@ O agente deve inspecionar os arquivos de manifesto e extensões presentes na rai
 | `pom.xml`, `build.gradle`, `*.java` | **Java** | JVM |
 | `go.mod`, `go.sum`, `*.go` | **Go** | Go runtime |
 
-### Algoritmo de Priorização:
+### Algoritmo de Priorização
+
 1. Buscar arquivos de gerenciamento de dependências na raiz (`package.json`, `requirements.txt`, etc.).
 2. Contabilizar a contagem de arquivos e extensões de código-fonte (`.py` vs `.js`).
 3. Declarar a linguagem primária dominante.
@@ -27,7 +28,8 @@ O agente deve inspecionar os arquivos de manifesto e extensões presentes na rai
 
 A identificação do framework é realizada por meio da análise das dependências declaradas e das chamadas de importação / inicialização:
 
-### Python:
+### Python
+
 - **Flask**:
   - Dependências: `flask`, `flask-cors`, `flask-sqlalchemy`
   - Código-fonte: `from flask import Flask`, `app = Flask(__name__)`, `Blueprint(...)`
@@ -38,7 +40,8 @@ A identificação do framework é realizada por meio da análise das dependênci
   - Dependências: `django`
   - Arquivos: `manage.py`, `wsgi.py`, `settings.py`
 
-### Node.js / JavaScript:
+### Node.js / JavaScript
+
 - **Express**:
   - Dependências: `express` no `package.json`
   - Código-fonte: `require('express')`, `const app = express()`
@@ -69,12 +72,14 @@ Identificar o driver de banco de dados ou ORM/ODM utilizado:
 
 A skill deve mapear exaustivamente todas as rotas expostas pela aplicação para garantir paridade 100% dos contratos pós-refatoração:
 
-### Em Flask:
+### Em Flask
+
 - Decorators diretos: `@app.route('/caminho', methods=['GET', 'POST', ...])`
 - Registro manual de URL: `app.add_url_rule('/caminho', endpoint='...', view_func=..., methods=[...])`
 - Blueprints: `@blueprint.route('/caminho', ...)` e `app.register_blueprint(blueprint)`
 
-### Em Express:
+### Em Express
+
 - Métodos diretos: `app.get('/path', handler)`, `app.post('/path', handler)`, `app.delete('/path', handler)`
 - Routers modulares: `router.get(...)` montados via `app.use('/prefix', router)`
 
@@ -83,6 +88,7 @@ A skill deve mapear exaustivamente todas as rotas expostas pela aplicação para
 ## 5. Mapeamento da Arquitetura Atual
 
 A skill deve classificar a maturidade arquitetural inicial do projeto:
+
 - **Monolítico Não Estruturado (God File / Monolith):** Toda a aplicação se concentra em 1 a 4 arquivos na raiz sem separação clara de responsabilidades (ex: rotas misturadas com SQL e regras de negócio no mesmo arquivo ou classe).
 - **Parcialmente Estruturado (Fragmented / Layer-Leaking):** Existem diretórios como `models/`, `routes/`, `services/`, porém camadas vazam responsabilidades (ex: controllers inexistentes, rotas executando queries SQL diretamente, modelos executando validações de apresentação ou sem injeção de dependências).
 - **MVC Bem Definido:** Camadas estritamente desacopladas em Models (dados/regras de entidade), Views/Routes (protocolo HTTP) e Controllers (orquestração de fluxo).

@@ -1,6 +1,7 @@
 # Architecture Audit Report — code-smells-project
 
 ## Metadados do Projeto
+
 - **Projeto:** `code-smells-project`
 - **Stack:** Python 3.14 + Flask 3.1.1
 - **Data da Auditoria:** 2026-09-10
@@ -23,6 +24,7 @@
 ## Detalhamento dos Findings
 
 ### [CRITICAL] AP-01: Arbitrary SQL Execution Backdoor (ID: CS-01)
+
 - **Arquivo e Linhas:** `app.py:59-78`
 - **Descrição do Problema:**
   O endpoint `/admin/query` aceita strings SQL brutas via JSON no corpo da requisição (`dados.get("sql")`) e executa-as diretamente no banco de dados via `cursor.execute(query)` sem qualquer validação ou autenticação. Além disso, o endpoint `/admin/reset-db` (`app.py:47-57`) deleta todas as tabelas sem autenticação.
@@ -34,6 +36,7 @@
 ---
 
 ### [CRITICAL] AP-02: Mass SQL Injection via String Concatenation (ID: CS-02)
+
 - **Arquivo e Linhas:** `models.py:28, 48-50, 58-60, 68, 92, 109-111, 126-129, 140, 149-150, 155, 158-160, 163-165, 174, 188, 192, 279-281, 289-299`
 - **Descrição do Problema:**
   Quase todas as operações no banco de dados SQLite utilizam concatenação direta de strings (`+` ou interpolação) com valores recebidos dos usuários, incluindo login (`email` e `senha`), busca de produtos (`termo`, `categoria`, `preco`), criação e atualização de entidades.
@@ -45,6 +48,7 @@
 ---
 
 ### [CRITICAL] AP-03: Hardcoded Credentials & Plaintext Passwords (ID: CS-03)
+
 - **Arquivo e Linhas:** `app.py:7` e `database.py:76-83`
 - **Descrição do Problema:**
   A chave de sessão `SECRET_KEY` está hardcoded como `"minha-chave-super-secreta-123"`. Além disso, senhas de usuários administradores e clientes são semeadas em texto puro (`"admin123"`, `"123456"`, `"senha123"`).
@@ -56,6 +60,7 @@
 ---
 
 ### [HIGH] AP-05: God File & Layer Coupling (ID: CS-04)
+
 - **Arquivo e Linhas:** `models.py:1-315` e `controllers.py:1-293`
 - **Descrição do Problema:**
   O arquivo `models.py` não é uma camada de modelos pura: ele implementa transações complexas, regras de estoque, cálculos de faturamento e regras de negócio de 4 domínios distintos (Produtos, Usuários, Pedidos e Relatórios). Da mesma forma, `controllers.py` agrupa todos os controladores em um único arquivo de 300 linhas com lógica de notificação fictícia embutida.
@@ -67,6 +72,7 @@
 ---
 
 ### [HIGH] AP-06: Sensitive Data Exposure in API Endpoints (ID: CS-05)
+
 - **Arquivo e Linhas:** `controllers.py:289` e `models.py:83, 99`
 - **Descrição do Problema:**
   O endpoint `/health` expõe publicamente a chave `SECRET_KEY`, ambiente e caminho interno do banco. As funções `get_todos_usuarios` e `get_usuario_por_id` retornam a chave `senha` no dicionário serializado.
@@ -78,6 +84,7 @@
 ---
 
 ### [HIGH] AP-07: Mutable Global State & Thread Unsafety (ID: CS-06)
+
 - **Arquivo e Linhas:** `database.py:4, 8-10`
 - **Descrição do Problema:**
   Uma variável global `db_connection = None` é instanciada com `sqlite3.connect(db_path, check_same_thread=False)`.
@@ -89,6 +96,7 @@
 ---
 
 ### [MEDIUM] AP-08: N+1 Queries in Iterative Loops (ID: CS-07)
+
 - **Arquivo e Linhas:** `models.py:139-166` e `models.py:187-200`
 - **Descrição do Problema:**
   Ao criar pedidos ou buscar pedidos de usuários, o código realiza consultas SQL iterativas para cada item e para cada produto relacionado (`cursor2.execute`, `cursor3.execute`), gerando múltiplos round-trips ao banco.
@@ -100,6 +108,7 @@
 ---
 
 ### [LOW] AP-10: Magic Numbers in Business Logic (ID: CS-08)
+
 - **Arquivo e Linhas:** `models.py:256-263`
 - **Descrição do Problema:**
   Faixas de desconto e percentuais de faturamento (`10000`, `5000`, `1000`, `0.1`, `0.05`, `0.02`) declarados como literais mágicos dispersos na função de relatório.
@@ -111,6 +120,7 @@
 ---
 
 ## Recomendações Prioritárias para a Fase 3 (Refatoração)
+
 1. Decompor `models.py` e `controllers.py` em estrutura MVC com pastas `src/models/`, `src/controllers/`, `src/routes/`, `src/config/`, `src/middlewares/`.
 2. Parametrizar 100% das queries SQL eliminando todas as vulnerabilidades de injeção.
 3. Isolar `SECRET_KEY` em `config/settings.py` e remover backdoors `/admin/query`.
@@ -120,6 +130,7 @@
 ---
 
 ## Status do Gate de Aprovação (HITL)
+
 - **Fase 2 concluída com sucesso.**
 - **Relatório exportado para:** `reports/audit-project-1.md`
 - **Aguardando aprovação do usuário para prosseguir para a Fase 3 (Refatoração).**

@@ -64,7 +64,8 @@ O relatório de auditoria deve ser gerado no seguinte formato Markdown estrito:
 
 ---
 
-## Regras de Preenchimento Mandatórias:
+## Regras de Preenchimento Mandatórias
+
 1. O arquivo deve sempre conter os caminhos e números de linha **exatos** no formato `<arquivo>:<linha>` ou `<arquivo>:<inicio>-<fim>`.
 2. Os findings devem ser ordenados estritamente por severidade decrescente: `CRITICAL` → `HIGH` → `MEDIUM` → `LOW`.
 3. O relatório deve contabilizar no mínimo 5 findings, incluindo obrigatoriamente pelo menos 1 de severidade `CRITICAL` ou `HIGH`.

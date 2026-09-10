@@ -6,12 +6,14 @@ Este playbook contém o catálogo de transformações concretas com exemplos de 
 
 ## 1. Receita T-01: Extração de Configurações Hardcoded para Módulo Dedicado
 
-### Problema:
+### Problema
+
 Credenciais e segredos embutidos diretamente no código-fonte, gerando vulnerabilidade de segurança e acoplamento de ambiente.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Python):**
+
 ```python
 # app.py
 app.config["SECRET_KEY"] = "minha-chave-super-secreta-123"
@@ -20,6 +22,7 @@ db_path = "loja.db"
 ```
 
 **Depois (Python):**
+
 ```python
 # config/settings.py
 import os
@@ -36,12 +39,14 @@ settings = Settings()
 
 ## 2. Receita T-02: Eliminação de SQL Injection via Queries Parametrizadas
 
-### Problema:
+### Problema
+
 Concatenação direta de strings de entrada do usuário em queries SQL, permitindo manipulação maliciosa.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Python/SQLite):**
+
 ```python
 # models.py
 cursor.execute("SELECT * FROM produtos WHERE id = " + str(id))
@@ -49,6 +54,7 @@ cursor.execute("INSERT INTO usuarios (nome, email) VALUES ('" + nome + "', '" + 
 ```
 
 **Depois (Python/SQLite):**
+
 ```python
 # models/produto_model.py
 cursor.execute("SELECT * FROM produtos WHERE id = ?", (id,))
@@ -59,12 +65,14 @@ cursor.execute("INSERT INTO usuarios (nome, email) VALUES (?, ?)", (nome, email)
 
 ## 3. Receita T-03: Decomposição de God Class / God File para Camadas MVC
 
-### Problema:
+### Problema
+
 Arquivo único contendo inicialização de banco, DDL, registro de rotas, lógica transacional e respostas HTTP.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Node.js/Express):**
+
 ```javascript
 // AppManager.js
 class AppManager {
@@ -79,6 +87,7 @@ class AppManager {
 ```
 
 **Depois (Node.js/Express MVC):**
+
 ```javascript
 // routes/checkoutRoutes.js
 const express = require('express');
@@ -108,12 +117,14 @@ class CheckoutController {
 
 ## 4. Receita T-04: Eliminação de Callback Hell com Async/Await e Promises
 
-### Problema:
+### Problema
+
 Aninhamento profundo de callbacks (Pyramid of Doom), dificultando leitura, manutenção e controle de erros.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Node.js):**
+
 ```javascript
 this.db.get("SELECT * FROM courses WHERE id = ?", [cid], (err, course) => {
     if (err) return res.status(500).send("Erro");
@@ -127,6 +138,7 @@ this.db.get("SELECT * FROM courses WHERE id = ?", [cid], (err, course) => {
 ```
 
 **Depois (Node.js):**
+
 ```javascript
 // database/dbHelper.js
 const getAsync = (db, sql, params) => new Promise((resolve, reject) => {
@@ -144,12 +156,14 @@ const user = await getAsync(db, "SELECT id FROM users WHERE email = ?", [e]);
 
 ## 5. Receita T-05: Criptografia Segura de Senhas e Sanitização de Respostas
 
-### Problema:
+### Problema
+
 Uso de MD5, funções caseiras de hash ou vazamento de hashes de senhas no JSON de resposta.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Python):**
+
 ```python
 # models/user.py
 import hashlib
@@ -162,6 +176,7 @@ class User(db.Model):
 ```
 
 **Depois (Python):**
+
 ```python
 # models/user_model.py
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -188,12 +203,14 @@ class User(db.Model):
 
 ## 6. Receita T-06: Remoção de Backdoors e Endpoints Inseguros
 
-### Problema:
+### Problema
+
 Endpoints que executam SQL arbitrário (`/admin/query`) ou limpam o banco sem autenticação (`/admin/reset-db`).
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes:**
+
 ```python
 @app.route("/admin/query", methods=["POST"])
 def executar_query():
@@ -202,6 +219,7 @@ def executar_query():
 ```
 
 **Depois:**
+
 ```python
 # O endpoint inseguro é completamente REMOVIDO da API pública.
 # Operações de banco passam a ser executadas via scripts de migração ou consoles CLI protegidos.
@@ -211,12 +229,14 @@ def executar_query():
 
 ## 7. Receita T-07: Resolução de N+1 Queries através de JOINs ou Eager Loading
 
-### Problema:
+### Problema
+
 Execução de query SQL dentro de loops iterativos sobre listas de registros pais.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Python SQLAlchemy):**
+
 ```python
 tasks = Task.query.all()
 for t in tasks:
@@ -225,6 +245,7 @@ for t in tasks:
 ```
 
 **Depois (Python SQLAlchemy):**
+
 ```python
 # Uso de joinedload para carregar relacionamento em consulta única:
 from sqlalchemy.orm import joinedload
@@ -237,12 +258,14 @@ for t in tasks:
 
 ## 8. Receita T-08: Substituição de APIs Deprecated / Obsoletas
 
-### Problema:
+### Problema
+
 Uso de métodos depreciados que geram warnings e quebram compatibilidade em versões recentes das stacks.
 
-### Exemplos de Transformação:
+### Exemplos de Transformação
 
 **1. `datetime.utcnow()` (Python 3.12+):**
+
 ```python
 # Antes:
 from datetime import datetime
@@ -254,6 +277,7 @@ created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 ```
 
 **2. `Model.query.get(id)` (SQLAlchemy 2.0):**
+
 ```python
 # Antes:
 task = Task.query.get(task_id)
@@ -266,12 +290,14 @@ task = db.session.get(Task, task_id)
 
 ## 9. Receita T-09: Tratamento Centralizado de Erros (Global Error Handler)
 
-### Problema:
+### Problema
+
 Blocos `try/except` repetidos em todos os controladores com mensagens manuais e tratamentos inconsistentes.
 
-### Exemplo de Transformação:
+### Exemplo de Transformação
 
 **Antes (Flask):**
+
 ```python
 def listar_produtos():
     try:
@@ -281,6 +307,7 @@ def listar_produtos():
 ```
 
 **Depois (Flask):**
+
 ```python
 # middlewares/error_handler.py
 from flask import jsonify

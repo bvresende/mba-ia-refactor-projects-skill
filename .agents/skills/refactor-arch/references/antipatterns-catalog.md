@@ -25,6 +25,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ## 1. Detalhamento dos Anti-Patterns
 
 ### [CRITICAL] AP-01: Arbitrary SQL Execution / Remote Backdoor
+
 - **Sinais de Detecção:**
   - Rotas recebendo queries em formato texto bruto do cliente via `request.get_json().get('sql')` ou `req.body.query` e passando diretamente para `cursor.execute(query)` ou `db.run(query)`.
   - Ausência de autenticação ou autorização em endpoints de execução de DDL/DML destrutivos (ex: `/admin/query`, `/admin/reset-db`).
@@ -34,6 +35,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [CRITICAL] AP-02: SQL Injection via String Concatenation
+
 - **Sinais de Detecção:**
   - Montagem de instruções SQL através de concatenação (`+`), interpolação ou f-strings com parâmetros não sanitizados:
     - Python: `cursor.execute("SELECT * FROM users WHERE id = " + str(id))` ou `f"SELECT ... WHERE nome = '{nome}'"`
@@ -44,6 +46,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [CRITICAL] AP-03: Hardcoded Secrets & Credentials Exposure
+
 - **Sinais de Detecção:**
   - Chaves de criptografia, segredos de sessão (`SECRET_KEY`), senhas de banco de dados ou chaves de gateway de pagamento (`pk_live_`, `sk_live_`) gravadas estaticamente em arquivos de código.
 - **Impacto:** Comprometimento do ambiente e vazamento em repositórios de versionamento.
@@ -52,6 +55,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [CRITICAL] AP-04: Broken / Insecure Cryptographic Hash
+
 - **Sinais de Detecção:**
   - Armazenamento de senhas em texto puro (`admin123`, `senha123`).
   - Hashing de senhas utilizando algoritmos criptograficamente quebrados (`MD5`, `SHA1`) sem salt, ou funções caseiras (ex: loops manuais com `Buffer.from(pwd).toString('base64')`).
@@ -61,6 +65,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [HIGH] AP-05: God Class / God File (Monolithic Coupling)
+
 - **Sinais de Detecção:**
   - Arquivo ou classe única centralizando criação de tabelas (DDL), sementes (DML), registro de rotas, manipulação de conexões, regras de negócio e formatação de resposta (`AppManager.js`, `models.py` com múltiplos domínios).
   - Classes ou módulos com alta complexidade ciclomática e mais de 300 linhas de responsabilidades mistas.
@@ -70,6 +75,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [HIGH] AP-06: Sensitive Data Exposure in API Payloads
+
 - **Sinais de Detecção:**
   - Métodos de serialização (`to_dict()`, `JSON.stringify()`) que incluem campos de credenciais (`password`, `senha`, `token_secreto`) no JSON de resposta.
   - Endpoints de saúde (`/health`) que retornam dados confidenciais de infraestrutura (chaves secretas, caminhos de arquivo, credenciais).
@@ -79,6 +85,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [HIGH] AP-07: Mutable Global State & Concurrency Race Condition
+
 - **Sinais de Detecção:**
   - Conexões de banco de dados alocadas em variáveis globais com `check_same_thread=False` sem controle de pool ou locks thread-safe.
   - Objetos globais mutáveis (`globalCache = {}`, `totalRevenue = 0`) manipulados diretamente por requisições concorrentes.
@@ -88,6 +95,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [MEDIUM] AP-08: N+1 Queries in Iterative Loops
+
 - **Sinais de Detecção:**
   - Execução de consultas SQL ou chamadas ORM dentro de loops iterativos (`for`, `forEach`, `while`) para obter registros filhos de uma lista pai:
     - Ex: Buscar itens de pedido para cada pedido em loop, ou buscar autor de cada tarefa via `User.query.get(task.user_id)`.
@@ -98,6 +106,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [MEDIUM] AP-09: Architectural Layer Bleed & Misplaced Responsibilities
+
 - **Sinais de Detecção:**
   - Rotas de CRUD de uma entidade alocadas no arquivo de rotas de outra entidade ou de relatórios (ex: CRUD de categorias dentro de `report_routes.py`).
   - Lógica de domínio pesada (como validação de estoque, regras de precificação e envio de notificações) implementada diretamente dentro de funções de rota ou views HTTP.
@@ -108,6 +117,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [LOW] AP-10: Magic Numbers & Hardcoded Business Constants
+
 - **Sinais de Detecção:**
   - Números e faixas de negócio fixos distribuídos no meio do código (ex: taxas de desconto `0.1`, `0.05`, `0.02`, limites de faturamento `10000`, `5000`, bandeiras de cartão `"4"`).
 - **Impacto:** Dificuldade de atualização de regras comerciais e perda de clareza semântica.
@@ -116,6 +126,7 @@ Este catálogo define os anti-patterns, falhas de segurança e code smells que a
 ---
 
 ### [LOW / MEDIUM] AP-11: Obsolete & Deprecated Framework APIs
+
 - **Sinais de Detecção e Equivalentes Modernos:**
 
 | Stack | API Deprecated / Obsoleta | Razão da Descontinuação | Equivalente Moderno Recomendado |
