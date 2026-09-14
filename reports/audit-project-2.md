@@ -15,9 +15,9 @@
 | :--- | :---: |
 | **CRITICAL** | 2 |
 | **HIGH** | 3 |
-| **MEDIUM** | 1 |
-| **LOW** | 1 |
-| **TOTAL** | **7** |
+| **MEDIUM** | 2 |
+| **LOW** | 2 |
+| **TOTAL** | **9** |
 
 ---
 
@@ -95,7 +95,19 @@
 
 ---
 
-### [LOW] AP-10: Cryptic Naming & Magic Values (ID: EC-07)
+### [MEDIUM] AP-09: Quebra de Integridade Referencial & Registros Órfãos (ID: EC-07)
+
+- **Arquivo e Linhas:** `src/AppManager.js:131-137`
+- **Descrição do Problema:**
+  O endpoint `DELETE /api/users/:id` executa `DELETE FROM users WHERE id = ?` sem remover as matrículas (`enrollments`) e pagamentos (`payments`) vinculados ao usuário deletado. O próprio código registra que as dependências ficam órfãs (`"Usuário deletado, mas as matrículas e pagamentos ficaram sujos no banco."`), violando a integridade referencial do modelo relacional.
+- **Impacto Arquitetural / Segurança:**
+  Inconsistência na geração de relatórios contábeis e acúmulo de registros zumbis no banco de dados sem relação válida.
+- **Recomendação de Refatoração:**
+  Ativar `PRAGMA foreign_keys = ON;` no SQLite e definir `ON DELETE CASCADE` ou implementar transação de deleção coordenada das entidades dependentes.
+
+---
+
+### [LOW] AP-10: Cryptic Naming & Magic Values (ID: EC-08)
 
 - **Arquivo e Linhas:** `src/AppManager.js:29-33, 46`
 - **Descrição do Problema:**
@@ -104,6 +116,18 @@
   Legibilidade severamente prejudicada e manutenção propensa a erros.
 - **Recomendação de Refatoração:**
   Documentar parâmetros e isolar validação de cartão em serviço de pagamento.
+
+---
+
+### [LOW] AP-10: Logs Informais e Falta de Logger Estruturado (ID: EC-09)
+
+- **Arquivo e Linhas:** `src/utils.js:13`, `src/AppManager.js:45`
+- **Descrição do Problema:**
+  Uso de `console.log` disperso com formatos manuais ad-hoc (`[LOG] Salvando no cache: ...`) sem padronização de severidade (info, warn, error) ou timestamp de contexto.
+- **Impacto Arquitetural / Segurança:**
+  Dificuldade de rastreamento de operações e impossibilidade de análise por coletores de logs estruturados em produção.
+- **Recomendação de Refatoração:**
+  Implementar middleware de logging estruturado padronizando saídas e níveis de severidade.
 
 ---
 

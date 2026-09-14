@@ -15,9 +15,9 @@
 | :--- | :---: |
 | **CRITICAL** | 3 |
 | **HIGH** | 3 |
-| **MEDIUM** | 1 |
-| **LOW** | 1 |
-| **TOTAL** | **8** |
+| **MEDIUM** | 2 |
+| **LOW** | 2 |
+| **TOTAL** | **10** |
 
 ---
 
@@ -95,7 +95,7 @@
 
 ---
 
-### [MEDIUM] AP-08: N+1 Queries in Iterative Loops (ID: CS-07)
+### [MEDIUM] AP-08: N+1 Queries in Iterative Loops (ID: CS-06)
 
 - **Arquivo e Linhas:** `models.py:139-166` e `models.py:187-200`
 - **Descrição do Problema:**
@@ -104,6 +104,18 @@
   Gargalo severo de performance e latência excessiva em tabelas maiores.
 - **Recomendação de Refatoração:**
   Utilizar junções SQL (`JOIN`) para carregar pedidos e itens em consultas consolidadas (Receita T-07).
+
+---
+
+### [MEDIUM] AP-09: Duplicação de Error Handling & Falta de Middleware Global (ID: CS-07)
+
+- **Arquivo e Linhas:** `controllers.py:10-12, 60-62, 95-96, 125-126, 185-186`
+- **Descrição do Problema:**
+  Todos os métodos do controlador repetem blocos idênticos de `try/except Exception as e:` que executam `print()` e retornam um JSON de erro genérico com status 500. Não existe um middleware centralizado (Global Error Handler) para captura padronizada de falhas no Flask.
+- **Impacto Arquitetural / Segurança:**
+  Duplicação massiva de código boilerplate, inconsistência de formatos de erro e ausência de captura centralizada de exceções inesperadas.
+- **Recomendação de Refatoração:**
+  Implementar manipuladores de erro centralizados via `@app.errorhandler` em `src/middlewares/error_handler.py` (Receita T-09).
 
 ---
 
@@ -116,6 +128,18 @@
   Dificuldade de manutenção e alteração de regras comerciais.
 - **Recomendação de Refatoração:**
   Extrair para constantes nomeadas em `config/constants.py` ou serviço de precificação.
+
+---
+
+### [LOW] AP-10: Inconsistência no Registro de Rotas e Logs Informais (ID: CS-09)
+
+- **Arquivo e Linhas:** `app.py:11-30, 32-45, 56`, `controllers.py:8, 57, 106`
+- **Descrição do Problema:**
+  Mistura despadronizada de abordagens de roteamento (`app.add_url_rule()` em bloco e `@app.route()` pontuais) e uso de `print()` informais em stdout (`"Listando X produtos"`, `"!!! BANCO DE DADOS RESETADO !!!"`) em vez de um sistema de logging estruturado e configurável.
+- **Impacto Arquitetural / Segurança:**
+  Dificuldade de rastreamento de requisições em produção e falta de uniformidade semântica no código.
+- **Recomendação de Refatoração:**
+  Padronizar a organização das rotas através de Blueprints e adotar logging estruturado com níveis adequados.
 
 ---
 
